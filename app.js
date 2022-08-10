@@ -81,7 +81,12 @@ app.post("/",function(req,res){
 
 app.post("/delete",function(req,res){
     const checked=req.body;
+    //console.log(checked);
     const check_item=checked.is_checked;
+    const prio=checked.priority;
+    console.log(check_item,prio);
+
+    if(!prio){
     Item.exists({ _id: check_item },function(err,ans){
     if(ans){
         Item.deleteOne({_id:check_item},function(err){
@@ -105,6 +110,89 @@ app.post("/delete",function(req,res){
         })
         res.redirect("/home")
     } });
+    }
+    else{
+        Item.exists({name:prio},function(err,ans){
+            if(ans){
+                Item.find({},function(err1,docs){
+                    if(err1){
+                        console.log("error occured");
+                    }
+                    else{
+                        //docs is an array of documents getting from mongoDB database
+                        let arr=[];
+                        let item;
+                       // console.log(docs);
+                        for(let i=0;i<docs.length;i++){
+                           // console.log(docs[i]._id)
+                            if(docs[i].name!==prio){
+                                arr.push({name:docs[i].name});
+                               // console.log(docs[i]._id)
+                            }
+                            else item=docs[i].name;
+                        }
+                        console.log(item);
+                        arr.unshift({name:item});
+                        Item.deleteMany({},function(err){
+                            if(err){
+                                console.log("error");
+                            }
+                            else{
+                                console.log("successfully deleted all the items");
+                            }
+                        })
+                        Item.insertMany(arr,function(err){
+                            if(err){
+                                console.log("error ");
+                            }
+                            else{
+                                console.log("successfully modified the array");
+                            }
+                        })
+                        res.redirect("/");
+                        
+                    }
+                })
+            }
+            else{
+                Hometask.find({},function(err,docs){
+                    if(err){
+                        console.log("error");
+                    }
+                    else{
+                        //docs is an array of documents getting from mongoDB database
+                        let arr=[];
+                        let item;
+                        for(let i=0;i<docs.length;i++){
+                            if(docs[i].name!==prio){
+                                arr.push({name:docs[i].name});
+                            }
+                            else item=docs[i].name;
+                        }
+                        arr.unshift({name:item});
+                        Hometask.deleteMany({},function(err){
+                            if(err){
+                                console.log("error");
+                            }
+                            else{
+                                console.log("successfully deleted all the items");
+                            }
+                        })
+                        Hometask.insertMany(arr,function(err){
+                            if(err){
+                                console.log("error ");
+                            }
+                            else{
+                                console.log("successfully modified the array");
+                            }
+                        })
+                        res.redirect("/home");
+                        
+                    }
+                })
+            }
+        })
+    }
 })
 
 

@@ -7,6 +7,7 @@
     <form action="/delete" method="post">
         <div class="item">
             <input type="checkbox" name="is_checked" value="<%= item._id %>" onchange="this.form.submit()">
+            <button style="color:white ;background-color:rgb(5, 6, 15)" name="priority" value="<%= item.name %>" type="submit">P</button>
             <p> <%= item.name %> </p>
         </div>
     </form>
